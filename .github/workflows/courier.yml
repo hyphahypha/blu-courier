@@ -1,0 +1,31 @@
+name: Push vAuto feeds
+
+# Delivers every dealer's photo-manifest CSV to their vAuto FTP.
+# Runs on a schedule (hands-off) and can be triggered manually for an instant push.
+on:
+  schedule:
+    # Every 15 minutes. GitHub may delay scheduled runs under load — fine here,
+    # vAuto polls infrequently. Public repo = unlimited free Actions minutes.
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}        # manual "Run workflow" button for instant delivery
+
+concurrency:
+  # Never run two pushes at once (avoids a half-written CSV on the FTP).
+  group: courier
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci || npm install
+      - name: Push feeds to dealer FTPs
+        env:
+          STUDIO_ADMIN_TOKEN: ${{ secrets.STUDIO_ADMIN_TOKEN }}
+          WORKER_BASE: ${{ vars.WORKER_BASE }}
+        run: node push-feeds.mjs

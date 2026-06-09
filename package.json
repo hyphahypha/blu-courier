@@ -1,0 +1,13 @@
+{
+  "name": "blu-courier",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pushes BLU Studio vAuto photo-manifest CSVs to dealer FTP on a schedule",
+  "scripts": {
+    "push": "node push-feeds.mjs"
+  },
+  "dependencies": {
+    "basic-ftp": "^5.0.5"
+  }
+}
