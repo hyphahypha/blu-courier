@@ -41,7 +41,11 @@ async function getDealers() {
 }
 
 async function getFeedCsv(slug) {
-  const res = await fetch(`${WORKER_BASE}/feed/${slug}.csv`);
+  // Feed is auth-gated (business-confidential VIN list). The courier holds the
+  // admin token, so it's authorized to read every dealer's feed.
+  const res = await fetch(`${WORKER_BASE}/feed/${slug}.csv`, {
+    headers: { Authorization: `Bearer ${ADMIN_TOKEN}` }
+  });
   if (!res.ok) throw new Error(`feed/${slug}.csv → HTTP ${res.status}`);
   return await res.text();
 }
